@@ -40,10 +40,10 @@ module Fuzz::Token
 			# a regular string that we
 			# can pass to chronic
 			first = unit_str.to_s[0,1]
-			if    first == "":  unit = @options[:default_unit]
-			elsif first == "y": unit = "year"
-			elsif first == "m": unit = "month"
-			elsif first == "d": unit = "day"
+			if    first == "" then unit = @options[:default_unit]
+			elsif first == "y" then unit = "year"
+			elsif first == "m" then unit = "month"
+			elsif first == "d" then unit = "day"
 			end
 			
 			# pass a nice string like "2 years ago" to chronic,
