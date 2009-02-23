@@ -95,7 +95,7 @@ module Fuzz
 					
 				# return a regex object to match
 				# incoming strings against
-				Regexp.new(rx, Regexp::IGNORECASE)
+				Regexp.compile(rx, Regexp::IGNORECASE, 'n')
 			end
 
 
