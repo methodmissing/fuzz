@@ -95,11 +95,10 @@ module Fuzz
 					
 				# return a regex object to match
 				# incoming strings against
-				Regexp.compile(rx, Regexp::IGNORECASE )
+				Regexp.compile(rx.force_encoding("utf-8"), Regexp::IGNORECASE )
 			end
 
 			def match(str)
-				
 				# perform the initial match by comparing
 				# the string with this classes regex, and
 				# abort if nothing matches
@@ -186,7 +185,7 @@ module Fuzz
 
 
 			def extract!(str)
-
+        str.force_encoding("utf-8")
 				# call Token#extract first,
 				# and abort it if failed
 				ext = extract(str)
