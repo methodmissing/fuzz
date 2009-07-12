@@ -98,6 +98,11 @@ module Fuzz
 				Regexp.compile(rx.force_encoding("utf-8"), Regexp::IGNORECASE )
 			end
 
+      alias :real_pattern :pattern
+      def pattern
+        @pattern ||= real_pattern()
+      end
+
 			def match(str)
 				# perform the initial match by comparing
 				# the string with this classes regex, and
