@@ -7,6 +7,9 @@ $spec = "../../spec/token.rb"
 module Fuzz
 	module Token
 		class Base
+      ENCODING = "utf-8".freeze
+      BLANK_STRING = ''.freeze
+      UNDERSCORE = '_'.freeze
 
 			def self.defined_types
 				subclasses = []
@@ -56,7 +59,7 @@ module Fuzz
 			#   SampleToken.new("It's a Weird Token Name!").name => :its_a_weird_token_name
 			#
 			def name
-				title.downcase.gsub(/\s+/, "_").gsub(/[^a-z0-9_]/i, "").to_sym
+				@name ||= title.downcase.gsub(/\s+/, UNDERSCORE).gsub(/[^a-z0-9_]/i, BLANK_STRING).to_sym
 			end
 
 
@@ -75,12 +78,12 @@ module Fuzz
 				# thing. This is vanity, so we can omit
 				# the parenthesis from the Patterns of
 				# simple Token subclasses.
-				pat = "(" + pat + ")"\
+				pat = "(#{pat})"\
 					unless pat.index "("
 
 				# build the patten wedged between delimiters,
 				# to avoid matching within other token bodies
-				del = "(" + Fuzz::Delimiter + ")"
+				del = "(#{Fuzz::Delimiter})"
 				
 				# wrap the pattern in delimiters,
 				# to avoid matching within fields
@@ -95,12 +98,12 @@ module Fuzz
 					
 				# return a regex object to match
 				# incoming strings against
-				Regexp.compile(rx.force_encoding("utf-8"), Regexp::IGNORECASE )
+				Regexp.compile(rx.force_encoding(ENCODING), Regexp::IGNORECASE )
 			end
 
       alias :real_pattern :pattern
       def pattern
-        @pattern ||= real_pattern()
+        @pattern ||= real_pattern
       end
 
 			def match(str)
@@ -108,7 +111,7 @@ module Fuzz
 				# the string with this classes regex, and
 				# abort if nothing matches
 				md = str.match(pattern)
-				return nil if md.nil?
+				return nil unless md
 				
 				# wrap the return value in Fuzz::Match, to
 				# provide much more useful access than the
@@ -179,23 +182,22 @@ module Fuzz
 				# attempt to match the token against _str_
 				# via Base#match, and abort it it failed
 				fm = match(str)
-				return nil if fm.nil?
+				return nil unless fm
 				m = fm.match_data
 
 				# return the Fuzz::Match and _str_ with the matched
 				# token replace by Fuzz::Replacement, to continue parsing
-				join = ((!m.pre_match.empty? && !m.post_match.empty?) ? Fuzz::Replacement : "")
-				[fm, m.pre_match + join + m.post_match]
+				join = ((!m.pre_match.empty? && !m.post_match.empty?) ? Fuzz::Replacement : BLANK_STRING)
+				[fm, "#{m.pre_match}#{join}#{m.post_match}"]
 			end
 
 
 			def extract!(str)
-        str.force_encoding("utf-8")
+        str.force_encoding(ENCODING)
 				# call Token#extract first,
 				# and abort it if failed
 				ext = extract(str)
-				return nil\
-					if ext.nil?
+				return nil unless ext
 
 				# update the argument (the BANG warns
 				# of the danger of this operation...),

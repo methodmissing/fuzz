@@ -140,8 +140,7 @@ module Fuzz
 		# be called by methods that don't make
 		# sense until something has been parsed.
 		def raise_unless_parsed
-			raise Fuzz::Error::NotParsedYet\
-				if @matches.nil?
+			raise Fuzz::Error::NotParsedYet unless @matches
 		end
 	end
 end
